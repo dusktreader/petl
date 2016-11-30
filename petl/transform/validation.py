@@ -109,6 +109,8 @@ def iterproblems(table, constraints, expected_header):
         for constraint in constraints:
             if 'getter' not in constraint:
                 if 'field' in constraint:
+                    if constraint['field'] not in flds and constraint['optional']:
+                        continue
                     # should ensure FieldSelectionError if bad field in
                     # constraint
                     indices = asindices(flds, constraint['field'])

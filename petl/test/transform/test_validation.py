@@ -8,6 +8,10 @@ import logging
 import petl as etl
 from petl.transform.validation import validate
 from petl.test.helpers import ieq
+from petl.errors import FieldSelectionError
+
+
+from nose.tools import raises, ok_
 
 
 logger = logging.getLogger(__name__)
@@ -47,6 +51,30 @@ def test_constraints():
     ieq(expect, actual)
     ieq(expect, actual)
 
+@raises(FieldSelectionError)
+def test_non_optional_constraint_with_missing_field():
+    constraints = [
+        dict(name='C1', field='foo', test=int),
+    ]
+
+    table = (('bar', 'baz'),
+             ('1999-99-99', 'z'))
+
+    actual = validate(table, constraints)
+    debug(actual)
+
+def test_optional_constraint_with_missing_field():
+    constraints = [
+        dict(name='C1', field='foo', test=int, optional=True),
+    ]
+
+    table = (('bar', 'baz'),
+             ('1999-99-99', 'z'))
+
+    actual = validate(table, constraints)
+    debug(actual)
+
+    ok_(len(actual) == 0)
 
 def test_row_length():
 
